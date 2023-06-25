@@ -12,7 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j //se utiliza para que funcione el log.inf(); para ver los errores.
-public class EmployeeService {
+public class EmployeeService implements EmployeeServiceInterface{
     private  final EmployeeRepository employeeRepository;
 
     public List<Employee> list(){
@@ -44,6 +44,7 @@ public class EmployeeService {
     }
 
     //Actualizar un registro
+    /* 1 - "ACTIVO" ; 2 - "DE VACACIONES" ; 3 - "EN DESCANSO"; 4 - "INACTIVO"*/
     public Employee updateEmploymentStatus(Long id,int estate){
         Employee employee =employeeRepository.findByIdAndState(id,true).orElse(null);
         if(employee==null && existeEstate(estate)!=true ) return null; //si existe lo vamos a actualizr
@@ -74,6 +75,7 @@ public class EmployeeService {
         return est;
     }
 
+    /* Actualizar: estado Inactivo ingresando fecha de fin de contrato*/
     public Employee updateEndContract(Long id,EmployeeRequest request){
         Employee employee =employeeRepository.findByIdAndState(id,true).orElse(null);
         if(employee==null) return null; //si existe lo vamos a actualizr
