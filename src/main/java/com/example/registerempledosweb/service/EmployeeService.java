@@ -21,11 +21,9 @@ public class EmployeeService {
         //Busca y trae todos los de estado True
     }
     //Crear un registro
-
     public Employee create(EmployeeRequest request){
         //por ese parametro nos envian los datos para insertar data ala BD
         Employee employee =new Employee();
-
         employee.setDni(request.getDni());
         employee.setName(request.getName());
         employee.setLastname(request.getLastname());
@@ -41,46 +39,54 @@ public class EmployeeService {
     }
     //Consultar un registro
     public Employee getById(Long id){
-        //Encuentre por el id.. sino le encuentra devuelve null
-        //Opcional.. clase jav a....Permite manejar nulos, el repository lo mete en un opcional y
-        //te dja a tí para que lo manejes.. por eso el orElse
-        //return customerRepository.findById(id).orElse(null);//Busca y trae sin importar el estado
-        return employeeRepository.findByIdAndState(id,true).orElse(null);//Busca y trae que cumplen con id y estado true
+        return employeeRepository.findByIdAndState(id,true).orElse(null);
+        //Busca y trae que cumplen con id y estado true
     }
 
     //Actualizar un registro
-    public Employee update(Long id,EmployeeRequest request){
-        //por ese parametro nos envian los datos para insertar data ala BD y ademas tenemos
-        //que consultar que exista enla BD con el id
+    public Employee updateEmploymentStatus(Long id,int estate){
         Employee employee =employeeRepository.findByIdAndState(id,true).orElse(null);
-        if(employee==null) return null; //si existe lo vamos a actualizr
-        employee.setDni(request.getDni());
-        employee.setName(request.getName());
-        employee.setLastname(request.getLastname());
-        employee.setAge(request.getAge());
-        employee.setSalary(request.getSalary());
-        employee.setContractdate(request.getContractdate());
-        employee.setDescription(request.getDescription());
-        employee.setEmploymentstatus(request.getEmploymentstatus());
-        employee.setState(request.isState());
-        //log.info("employee:{}", employee);
+        if(employee==null && existeEstate(estate)!=true ) return null; //si existe lo vamos a actualizr
+        else {
+            switch (estate){
+
+            case 1: employee.setEmploymentstatus("ACTIVO");break;
+            case 2: employee.setEmploymentstatus("DE VACACIONES");break;
+            case 3: employee.setEmploymentstatus("EN DESCANSO");break;
+            case 4: employee.setEmploymentstatus("INACTIVO");break;
+            default:  break;
+
+                }
+            }
         return employeeRepository.save(employee);//retorna el objeto actualizadoo
     }
-    //Eliminar un registro Definitivamente
-   /* public String deleteFisico(Long id){ //ELIMINA EL REGISTRO DEFINITIVAMENTE
-        Employee employee =employeeRepository.findById(id).orElse(null);
-        if(employee==null) return "El Registro no Existe!!";
-        employeeRepository.deleteById(id);
-        return "Registro Eliminado Definitivamente"+employee.getName();
-    } */
-    //Eliminar un REgistro de Manera Logica
-    public String deleteLogico(Long id){ //Para ello tenemos que crear un
-        /* Vammos a consultar a la BD, ya no se va a buscar por findById. por lo
-         * que vamos a repository y vamos a crear un metodo que permita buscar por ID*/
+
+    public boolean existeEstate(int state){
+        boolean est=false;
+        switch (state)
+        {
+            case 1: est=true;break;
+            case 2: est=true;break;
+            case 3: est=true;break;
+            case 4: est=true;break;
+            default:  est=false;break;
+        }
+        return est;
+    }
+
+    public Employee updateEndContract(Long id,EmployeeRequest request){
         Employee employee =employeeRepository.findByIdAndState(id,true).orElse(null);
-        //Aquí se busca con el metodo creado y solo se busca los que tienen estado true y exista el id
+        if(employee==null) return null; //si existe lo vamos a actualizr
+        employee.setContractenddate(request.getContractenddate());
+        employee.setEmploymentstatus("INACTIVO");
+        //log.info("employee:{}", employee);
+        return employeeRepository.save(employee);
+    }
+
+    //Eliminar un REgistro de Manera Logica
+    public String deleteLogico(Long id){
+        Employee employee =employeeRepository.findByIdAndState(id,true).orElse(null);
         if(employee==null) return "El Registro no Existe!!";
-        //Ahora para actualizar tambien vamos a crear un metodo en Repositry  para actualizar
         employee.setState(false);//ACtualiza el estado
         employeeRepository.save(employee);//Guarda los datos actualizados
         return "Registro Eliminado Lógicamente"+employee.getName();
