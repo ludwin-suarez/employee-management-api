@@ -13,4 +13,10 @@ public interface EmployeeRepository extends JpaRepository<Employee,Long> {
     //busca por id y estado Para eliminar un resgistro
 
     List<Employee> findAllByState(Boolean state);
+    List<Employee> findAllByIdAndState(Long id,Boolean state);
+
+    //para traer por estado:
+    List<Employee> findAllByWorkingstatusAndState(Integer workingstatus,Boolean state);
+    //Estos nombres de los parametos tienen que ser igual que las las tablas de BD
+    List<Employee> findAllByDniAndState(String dni,Boolean state);
 }

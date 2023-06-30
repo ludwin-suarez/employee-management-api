@@ -27,8 +27,8 @@ public class EmployeeRequest {
     @Size(max = 70)
     //@Pattern(regexp = "^[A-Z]+$", message = "SE ADMITEN SOLO MAYUSCULAS")
     private String lastname;
-    @NotNull(message = "EL CAMPO EDAD NO PUEDE SER NULO")
-    private int age;//edad
+    @NotNull(message = "EL CAMPO FECHA DE NACIMIENTO NO PUEDE SER NULO")
+    private Date dateofbirth;//Fecha de Nacimiento
     private BigDecimal salary;
     @NotNull(message = "EL CAMPO FECHA DE CONTRATO NO PUEDE SER NULO")
     private Date contractdate;
@@ -39,9 +39,9 @@ public class EmployeeRequest {
     @NotBlank
     private String description;
     @NotNull(message="EL CAMPO DE ESTADO DEL EMPLEADO DEBE ESTAR EN MAYUSCULA")
-    @NotBlank
-    @Pattern(regexp = "^[A-Z]+$", message = "SE ADMITEN SOLO MAYUSCULAS")
-    private String employmentstatus;
+    //@Pattern(regexp = "\\d*", message = "El ESTADO DE TRABAJO SOLO DEBE DE ESTAR EN FORMATO DE SOLO NÚMEROS")
+   // @Pattern(regexp = "^[1-4]+$", message = "El ESTADO DE TRABAJO TIENE QUE SER 1,2,3 Ó 4")
+    private int workingstatus;
 
     @NotNull(message = "EL CAMPO ESTADO NO PUEDE SER NULO")
     private boolean state;

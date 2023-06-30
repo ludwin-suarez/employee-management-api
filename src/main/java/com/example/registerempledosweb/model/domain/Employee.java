@@ -26,8 +26,8 @@ private  static  final long SerialVersionUID=1L;
     @Column(name="lastname")
     private String lastname;
 
-    @Column(name="age")
-    private int age;//edad
+    @Column(name="dateofbirth")
+    private Date dateofbirth;//Fecha de Nacimiento
 
     @Column(name="salary")
     private BigDecimal salary;
@@ -37,8 +37,8 @@ private  static  final long SerialVersionUID=1L;
     private Date contractenddate;
     @Column(name="description")
     private String description;
-    @Column(name="employmentstatus")
-    private String employmentstatus;
+    @Column(name="workingstatus")
+    private int workingstatus;
 
     @Column(name="state")
     private boolean state;
