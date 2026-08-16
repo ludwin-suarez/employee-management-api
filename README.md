@@ -1,3 +1,6 @@
+//--------------------------------------------------------
+Initial Estructure of the employee managmente project
+//--------------------------------------------------------
 src/main/java
 └── com.example.registerempledosweb
     ├── controller
@@ -18,3 +21,31 @@ src/main/java
 
 src/main/resources
 └── application.properties
+
+//-----------------------------------
+INITIAL CONFIGURATION of the pom.xml
+//-----------------------------------
+
+Spring Boot 2.1.6
+Java 8
+MySQL connector antiguo
+JUnit/Spring Test (version 4)
+
+//--------------------------------------------------------
+CONFIGURATION OF THE pom.xmlWHEN UPDATE SPRING BOOT, JAVA,
+AMONG OTHERS TO RECENT VERSIONS.
+//--------------------------------------------------------
+
+java 21 ... Se cambió javax. por jakarta.
+  !
+Spring Boot 4.0.7 //no funcionó la 4.1.0 tiene el bug GrpcServerStartedEvent 
+  !
+spring MVC
+  !
+JPA
+  !
+MySQL
+  !
+Validation
+  !
+Testing (JUnit 5)

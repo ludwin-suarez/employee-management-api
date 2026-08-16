@@ -1,45 +1,43 @@
 package com.example.registerempledosweb.model.domain;
 
-
 import lombok.Data;
-import javax.persistence.*;
-
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
-@Table(name="employee")
+@Table(name = "employee")
 @Data
 public class Employee implements Serializable {
-private  static  final long SerialVersionUID=1L;
+    // private static final long SerialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name="dni",length =8 )
+    @Column(name = "dni", length = 8)
     private String dni;
 
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name="lastname")
+    @Column(name = "lastname")
     private String lastname;
 
-    @Column(name="dateofbirth")
-    private Date dateofbirth;//Fecha de Nacimiento
+    @Column(name = "dateofbirth")
+    private Date dateofbirth;// Fecha de Nacimiento
 
-    @Column(name="salary")
+    @Column(name = "salary")
     private BigDecimal salary;
-    @Column(name="contractdate")
+    @Column(name = "contractdate")
     private Date contractdate;
-    @Column(name="contractenddate")
+    @Column(name = "contractenddate")
     private Date contractenddate;
-    @Column(name="description")
+    @Column(name = "description")
     private String description;
-    @Column(name="workingstatus")
+    @Column(name = "workingstatus")
     private int workingstatus;
 
-    @Column(name="state")
+    @Column(name = "state")
     private boolean state;
 }
