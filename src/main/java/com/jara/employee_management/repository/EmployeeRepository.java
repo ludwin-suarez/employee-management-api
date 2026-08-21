@@ -1,25 +1,19 @@
 package com.jara.employee_management.repository;
 
-//import com.example.registerempledosweb.model.request.EmployeeRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import com.jara.employee_management.model.domain.Employee;
-
 import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    Optional<Employee> findByIdAndState(Long id, Boolean state);
+    Optional<Employee> findByIdAndActive(Long id, Boolean active);
+
     // busca por id y estado Para eliminar un resgistro
+    List<Employee> findAllByActive(Boolean state);
 
-    List<Employee> findAllByState(Boolean state);
-
-    List<Employee> findAllByIdAndState(Long id, Boolean state);
-
-    // para traer por estado:
-    List<Employee> findAllByWorkingstatusAndState(Integer workingstatus, Boolean state);
+    List<Employee> findAllByIdAndActive(Long id, Boolean active);
 
     // Estos nombres de los parametos tienen que ser igual que las las tablas de BD
-    List<Employee> findAllByDniAndState(String dni, Boolean state);
+    List<Employee> findAllByDniAndActive(String dni, Boolean active);
 }

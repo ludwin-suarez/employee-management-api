@@ -7,8 +7,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import com.jara.employee_management.model.statusenum.EmployeeWorkingStatus;
-
 @Entity
 @Table(name = "employee")
 @Data
@@ -25,7 +23,7 @@ public class Employee implements Serializable {
     private String name;
 
     @Column(name = "lastName")
-    private String lastname;
+    private String lastName;
 
     @Column(name = "email")
     private String email;
@@ -44,14 +42,17 @@ public class Employee implements Serializable {
 
     @Column(name = "description")
     private String description;
-
-    @ManyToOne
+    // fetch = FetchType.LAZY:Carga Perezosa) Le indica a JPA que no traiga los
+    // datos del objeto relacionado de la BD
+    // hasta que sean necesarios explícitamente (por ejemplo, cuando llames a
+    // employee.getDepartment()).
     @JoinColumn(name = "statusId")
-    private EmployeeStatus statusId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private EmployeeStatus employeeStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "departmentId")
-    private Department departmentId;
+    private Department department;
 
     @Column(name = "active")
     private boolean active;

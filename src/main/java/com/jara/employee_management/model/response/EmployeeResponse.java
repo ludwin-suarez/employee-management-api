@@ -4,7 +4,7 @@ package com.jara.employee_management.model.response;
 import lombok.Builder;
 import lombok.Data;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -13,16 +13,14 @@ public class EmployeeResponse {
     private String dni;
     private String name;
     private String lastname;
-    private Date dateofbirth;// Fecha de Nacimiento
+    private String email;
+    private LocalDate dateofbirth;// Fecha de Nacimiento
     private BigDecimal salary;
-    private Date contractdate;
-
-    private Date contractenddate;
+    private LocalDate contractdate;
+    private LocalDate contractenddate;
     private String description;
-
     private EmployeeStatusResponse employeStatus;
     private DepartmentResponse department;
-
     private Boolean active;
 
 }

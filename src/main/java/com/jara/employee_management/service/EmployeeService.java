@@ -1,5 +1,6 @@
 package com.jara.employee_management.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.jara.employee_management.model.domain.Employee;
@@ -13,11 +14,10 @@ public interface EmployeeService {
 
     public List<EmployeeResponse> getById(Long id);
 
-    public Employee updateWorkingStatus(Long id, int state);
+    public Employee updateWorkingStatus(Long id, String code);
 
-    public Employee updateEndContractAndUpdateInactivoAutomatic(Long id, EmployeeRequest request);
+    public Employee updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract, String code);
 
     public String deleteLogico(Long id);
 
-    public List<EmployeeResponse> getReportWorkingStatus(Integer workingstatus);
 }

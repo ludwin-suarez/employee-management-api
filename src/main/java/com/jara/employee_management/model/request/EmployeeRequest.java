@@ -7,7 +7,6 @@ import lombok.Data;
 import jakarta.validation.constraints.*;/* Incluye a .NotBlank| .NotNull | .Pattern*/
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 public class EmployeeRequest {

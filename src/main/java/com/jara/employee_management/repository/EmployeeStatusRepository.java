@@ -9,6 +9,8 @@ public interface EmployeeStatusRepository extends JpaRepository<EmployeeStatus, 
 
     Optional<EmployeeStatus> findByCode(String code);
 
+    // EmployeeStatus findByCode
+
     boolean existsByCode(String code);
 
     // Integer employeeStatusByCode(String code);

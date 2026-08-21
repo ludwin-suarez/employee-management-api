@@ -10,6 +10,7 @@ import com.jara.employee_management.model.request.EmployeeRequest;
 import com.jara.employee_management.model.response.EmployeeResponse;
 import com.jara.employee_management.service.EmployeeService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -19,13 +20,14 @@ import java.util.List;
 public class EmployeeController {
     // @GetMapping("/lista")
     private final EmployeeService employeeServiceInterface; // inyección de dependencias
-    // Listar muchos registros
 
+    // OK -- Listar muchos registros
     @GetMapping()
     public List<EmployeeResponse> list() {
         return employeeServiceInterface.list();
     }
 
+    // OK -- Create Employee
     @PostMapping()
     public List<EmployeeResponse> create(@RequestBody @Validated EmployeeRequest request) {// aqui vamos a pedir al
                                                                                            // usuario data
@@ -33,38 +35,33 @@ public class EmployeeController {
         return employeeServiceInterface.create(request);
     }
 
-    // Consultar un registro
+    // OK --Search an Employee
     @GetMapping("/{id}")
     public List<EmployeeResponse> getById(@PathVariable("id") Long idCustomer) {
         return employeeServiceInterface.getById(idCustomer);
     }
 
-    // Actualizar El estado de un empleado:
-    /* 1 - "ACTIVO" ; 2 - "DE VACACIONES" ; 3 - "EN DESCANSO"; 4 - "INACTIVO" */
-    @PatchMapping("/{id}/{estado}")
-    public Employee updateEmployeeState(@PathVariable("id") Long idEmployee, @PathVariable("estado") int estado) {
-        return employeeServiceInterface.updateWorkingStatus(idEmployee, estado);
+    // OK-- Actualizar El estado de un empleado:
+    /* 1 - "ACTIVE" ; 2 - "VACATION" ; 3 - "REST"; 4 - "INACTIVE" */
+    @PatchMapping("/{id}/{code}")
+    public Employee updateEmployeeState(@PathVariable("id") Long idEmployee, @PathVariable("code") String code) {
+        return employeeServiceInterface.updateWorkingStatus(idEmployee, code);
     }
 
-    // Actualizar un registro
     /*
-     * Actualizar: estado Inactivo ingresando fecha de fin de contrato ejemplo:
+     * Update: estado INACTIVO ingresando fecha de fin de contrato ejemplo:
      * { "contractenddate": "2023-06-25" }
      */
-    @PutMapping("/{id}")
-    public Employee updateEndContract(@PathVariable("id") Long idEmployee, @RequestBody EmployeeRequest request) {
-        return employeeServiceInterface.updateEndContractAndUpdateInactivoAutomatic(idEmployee, request);
+    @PutMapping("/{id}/{endDate}/{code}")
+    public Employee updateEndContract(@PathVariable("id") Long idEmployee,
+            @PathVariable("endDate") LocalDate dateEndContract, @PathVariable("code") String code) {
+        return employeeServiceInterface.updateEndContractAndUpdateInactivoAutomatic(idEmployee, dateEndContract, code);
     }
 
-    // Eliminar un registro Lógicamente
+    // Delete an employee Lógicamente
     @DeleteMapping("/{id}") // Para este caso tenemos que crear un
     public String delete(@PathVariable("id") Long idEmployee) {
         return employeeServiceInterface.deleteLogico(idEmployee);
-    }
-
-    @GetMapping("/report/{workingstatus}")
-    public List<EmployeeResponse> reportWorkingStatus(@PathVariable("workingstatus") Integer workingstatus) {
-        return employeeServiceInterface.getReportWorkingStatus(workingstatus);
     }
 
 }

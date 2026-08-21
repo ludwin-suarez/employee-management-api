@@ -8,6 +8,7 @@ import lombok.Data;
 public class EmployeeStatusResponse {
 
     private Long id;
+    private String code;
     private String name;
 
 }
