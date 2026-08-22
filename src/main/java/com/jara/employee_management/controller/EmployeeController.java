@@ -5,63 +5,73 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import com.jara.employee_management.model.domain.Employee;
 import com.jara.employee_management.model.request.EmployeeRequest;
 import com.jara.employee_management.model.response.EmployeeResponse;
 import com.jara.employee_management.service.EmployeeService;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@Validated // Valida var de parametros y metodos de controller
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/employee")
+@RequestMapping("/api/employee")
 public class EmployeeController {
-    // @GetMapping("/lista")
-    private final EmployeeService employeeServiceInterface; // inyección de dependencias
 
-    // OK -- Listar muchos registros
+    private final EmployeeService employeeService; // inyección de dependencias
+
+    // GET /api/employee
     @GetMapping()
     public List<EmployeeResponse> list() {
-        return employeeServiceInterface.list();
+        return employeeService.list();
     }
 
-    // OK -- Create Employee
+    // POST /api/employee
     @PostMapping()
-    public List<EmployeeResponse> create(@RequestBody @Validated EmployeeRequest request) {// aqui vamos a pedir al
-                                                                                           // usuario data
+    public List<EmployeeResponse> create(
+            @RequestBody @Valid EmployeeRequest request) {
         log.info("request: {}", request);
-        return employeeServiceInterface.create(request);
+        return employeeService.create(request);
     }
 
-    // OK --Search an Employee
+    // GET /api/employee/{id}
     @GetMapping("/{id}")
-    public List<EmployeeResponse> getById(@PathVariable("id") Long idCustomer) {
-        return employeeServiceInterface.getById(idCustomer);
+    public List<EmployeeResponse> getById(
+            @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
+        return employeeService.getById(idEmployee);
     }
 
-    // OK-- Actualizar El estado de un empleado:
     /* 1 - "ACTIVE" ; 2 - "VACATION" ; 3 - "REST"; 4 - "INACTIVE" */
+    // PATCH /api/employee/{id}/{code}
     @PatchMapping("/{id}/{code}")
-    public Employee updateEmployeeState(@PathVariable("id") Long idEmployee, @PathVariable("code") String code) {
-        return employeeServiceInterface.updateWorkingStatus(idEmployee, code);
+    public EmployeeResponse updateEmployeeState(
+            @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee,
+            @PathVariable String code) {
+        return employeeService.updateWorkingStatus(idEmployee, code);
     }
 
     /*
      * Update: estado INACTIVO ingresando fecha de fin de contrato ejemplo:
      * { "contractenddate": "2023-06-25" }
      */
-    @PutMapping("/{id}/{endDate}/{code}")
-    public Employee updateEndContract(@PathVariable("id") Long idEmployee,
-            @PathVariable("endDate") LocalDate dateEndContract, @PathVariable("code") String code) {
-        return employeeServiceInterface.updateEndContractAndUpdateInactivoAutomatic(idEmployee, dateEndContract, code);
+
+    // PUT /api/employee/{id}/{endDate}/{code}
+    @PutMapping("/{id}/{endDate}")
+    public EmployeeResponse updateEndContract(
+            @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee,
+            @PathVariable("endDate") LocalDate dateEndContract) {
+        return employeeService.updateEndContractAndUpdateInactivoAutomatic(idEmployee, dateEndContract);
     }
 
-    // Delete an employee Lógicamente
+    // DELETE /api/employee/{id}
     @DeleteMapping("/{id}") // Para este caso tenemos que crear un
-    public String delete(@PathVariable("id") Long idEmployee) {
-        return employeeServiceInterface.deleteLogico(idEmployee);
+    public String delete(
+            @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
+        return employeeService.deleteLogico(idEmployee);
     }
 
 }

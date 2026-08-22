@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import com.jara.employee_management.exception.BusinessException;
 import com.jara.employee_management.exception.ResourceNotFoundException;
 import com.jara.employee_management.model.domain.Department;
 import com.jara.employee_management.model.domain.Employee;
@@ -30,7 +31,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final EmployeeStatusRepository employeeStatusRepository;
 
-    // ### METODOS DE BUSQUEDAS RAPIDAS
+    // =========================================================
+    // MÉTODOS AUXILIARES
     private EmployeeStatus optionalEmployeeStatus(String code) {
         // 2. Buscar y retorna un objeto employeeStatus
         return employeeStatusRepository.findByCode(code)
@@ -43,25 +45,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
-    // OK -- Devuelve lista de Empleados Activos //CORREGIDO 2026-08-21
+    // =========================================================
+
+    // LIST EMPLOYEES
+    @Override
     public List<EmployeeResponse> list() {
         return employeeRepository.findAllByActive(true).stream()
                 .map(EmployeeMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    // OK -- Crear un registro de empleados //CORREGIDO 2626-08-20 //FALTA PROBAR
+    // CREATE EMPLOYEE
+    @Override
     public List<EmployeeResponse> create(EmployeeRequest request) {
         Employee employ = EmployeeMapper.toEntity(request);
         employ.setEmployeeStatus(optionalEmployeeStatus(request.getCode()));
         employ.setDepartment(optionalDepartment(request.getDepartmentId(), true));
-        // log.info("employ:{}", employ);??
         employeeRepository.save(employ);
         return employeeRepository.findAllByDniAndActive(employ.getDni(), employ.isActive()).stream()
                 .map(EmployeeMapper::toResponse).collect(Collectors.toList());// java 8
+        // .map(EmployeeMapper::toResponse).toList(); java 21
     }
 
-    // OK -- Consultar un registro List<EmployeeResponse>// CORREGIDO:2026-08-21
+    // SEARCH EMPLOYEE FOR ID
+    @Override
     public List<EmployeeResponse> getById(Long id) {
         Employee employeeTemp = employeeRepository.findByIdAndActive(id, true)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -73,8 +80,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
-    // OK -- Actualizar status de un registro //UPDATE:2026-08-20
-    public Employee updateWorkingStatus(Long id, String code) {
+    // UPDATE STATUS EMPLOYEE, SEARCH FOR ID AND CODE
+    @Override
+    public EmployeeResponse updateWorkingStatus(Long id, String code) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "EMPLEADO NO ENCONTRADO CON ID: " + id));
@@ -82,40 +90,44 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setEmployeeStatus(optionalEmployeeStatus(code));// Codigo para delete
         employee.setUpdatedAt(LocalDateTime.now());
 
-        return employeeRepository.save(employee);
+        return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
-    /*
-     * OK -- UPDATE: END CONTRACT /INACTIVO STATUS/NO ACTIVO REVISAR HAY UN VACIO
-     */
-    public Employee updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract, String code) {
+    // UPDATE CONTRACT END DATE POR ID AND ENDDATE
+    @Override
+    public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
-                .orElseThrow(() -> new ResourceNotFoundException(" ID no encontrado " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("  EMPLEADO NO ENCONTRADO CON ID: " + id));
 
         if (dateEndContract == null) {
-            throw new IllegalArgumentException(
+            throw new BusinessException(
                     "LA FECHA DE FIN DE CONTRATO ES OBLIGATORIA");
         }
 
         if (dateEndContract.isBefore(employee.getHireDate())) {
-            throw new IllegalArgumentException(
+            throw new BusinessException(
                     "LA FECHA DE FIN DE CONTRATO NO PUEDE SER MENOR QUE LA FECHA DE CONTRATACIÓN");
+            // throw new IllegalArgumentException(
+            // "LA FECHA DE FIN NO PUEDE SER MENOR QUE LA FECHA DE CONTRATACIÓN");
         }
 
-        EmployeeStatus status = optionalEmployeeStatus(code);
+        ;
         employee.setEndDate(dateEndContract);
         employee.setActive(false);
-        employee.setEmployeeStatus(status);
-        return employeeRepository.save(employee);
+        employee.setEmployeeStatus(optionalEmployeeStatus("INACTIVE"));
+        employee.setUpdatedAt(LocalDateTime.now());
+        return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
-    // OK -- DELETE logically //UPDATE> 2026-08-20//2026-08-21
+    // DELETE LOGICALLY
+    @Override
     public String deleteLogico(Long id) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
-                .orElseThrow(() -> new ResourceNotFoundException(" ID no encontrado " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON ID: " + id));
         EmployeeStatus status = optionalEmployeeStatus("INACTIVE");// DELETE LOGICAMENTE
         employee.setActive(false);
         employee.setEmployeeStatus(status);
+        employee.setUpdatedAt(LocalDateTime.now());
         employeeRepository.save(employee);
         return "Registro Eliminado Lógicamente" + employee.getName();
     }
