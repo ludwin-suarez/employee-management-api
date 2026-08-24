@@ -12,7 +12,7 @@ public interface EmployeeService {
 
     public List<EmployeeResponse> create(EmployeeRequest request);
 
-    public List<EmployeeResponse> getById(Long id);
+    public EmployeeResponse getById(Long id);
 
     public EmployeeResponse updateWorkingStatus(Long id, String code);
 

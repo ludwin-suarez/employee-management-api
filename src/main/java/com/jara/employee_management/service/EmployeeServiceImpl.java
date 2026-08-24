@@ -4,6 +4,7 @@ import com.jara.employee_management.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jara.employee_management.exception.BusinessException;
 import com.jara.employee_management.exception.ResourceNotFoundException;
@@ -48,14 +49,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     // =========================================================
 
     // LIST EMPLOYEES
+    @Transactional(readOnly = true)
     @Override
     public List<EmployeeResponse> list() {
         return employeeRepository.findAllByActive(true).stream()
-                .map(EmployeeMapper::toResponse)
-                .collect(Collectors.toList());
+                .map(EmployeeMapper::toResponse).toList();
+        // .collect(Collectors.toList());
     }
 
     // CREATE EMPLOYEE
+    @Transactional
     @Override
     public List<EmployeeResponse> create(EmployeeRequest request) {
         Employee employ = EmployeeMapper.toEntity(request);
@@ -68,19 +71,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     // SEARCH EMPLOYEE FOR ID
-    @Override
-    public List<EmployeeResponse> getById(Long id) {
-        Employee employeeTemp = employeeRepository.findByIdAndActive(id, true)
+    @Transactional(readOnly = true) // work with @ManyToOne(fetch = FetchType.LAZY)
+    @Override // Caso contrario se cierra la sesion antes de mapear la data
+    public EmployeeResponse getById(Long id) {
+        return employeeRepository.findByIdAndActive(id, true).map(EmployeeMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "EMPLEADO NO ENCONTRADO CON ID: " + id));
-        return employeeRepository.findAllByIdAndActive(employeeTemp.getId(), true)
-                // .stream().map(EmployeeMapper::toResponse).collect(Collectors.toList());//java
-                // 8-15
-                .stream().map(EmployeeMapper::toResponse).toList();// java 16-21, funciona el toList()
+
+        // .stream().map(EmployeeMapper::toResponse).collect(Collectors.toList());//java
+        // 8-15
+        // .stream().map(EmployeeMapper::toResponse).toList();// java 16-21, funciona el
+        // toList()
 
     }
 
     // UPDATE STATUS EMPLOYEE, SEARCH FOR ID AND CODE
+    @Transactional()
     @Override
     public EmployeeResponse updateWorkingStatus(Long id, String code) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
@@ -94,6 +100,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     // UPDATE CONTRACT END DATE POR ID AND ENDDATE
+    @Transactional()
     @Override
     public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
@@ -124,12 +131,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     public String deleteLogico(Long id) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
                 .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON ID: " + id));
-        EmployeeStatus status = optionalEmployeeStatus("INACTIVE");// DELETE LOGICAMENTE
+        EmployeeStatus status = optionalEmployeeStatus("DELET");// DELETE LOGICAMENTE
         employee.setActive(false);
         employee.setEmployeeStatus(status);
         employee.setUpdatedAt(LocalDateTime.now());
         employeeRepository.save(employee);
-        return "Registro Eliminado Lógicamente" + employee.getName();
+        return "Registro Eliminado Lógicamente: " + employee.getName();
     }
 
 }

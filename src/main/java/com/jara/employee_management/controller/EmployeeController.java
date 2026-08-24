@@ -25,7 +25,7 @@ public class EmployeeController {
     private final EmployeeService employeeService; // inyección de dependencias
 
     // GET /api/employee
-    @GetMapping()
+    @GetMapping("/listar")
     public List<EmployeeResponse> list() {
         return employeeService.list();
     }
@@ -40,7 +40,7 @@ public class EmployeeController {
 
     // GET /api/employee/{id}
     @GetMapping("/{id}")
-    public List<EmployeeResponse> getById(
+    public EmployeeResponse getById(
             @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
         return employeeService.getById(idEmployee);
     }

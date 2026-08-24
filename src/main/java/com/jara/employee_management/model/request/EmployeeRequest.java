@@ -1,10 +1,8 @@
 package com.jara.employee_management.model.request;
 
-/* Aplicar en el project los imports coment */
 //import org.apache.logging.log4j.message.Message;/*No se está usando */
-//import jakarta.persistence.Column; /*No se está usando */
 import lombok.Data;
-import jakarta.validation.constraints.*;/* Incluye a .NotBlank| .NotNull | .Pattern*/
+import jakarta.validation.constraints.*;/* Incluye a .NotBlank| .NotNull | .Pattern | DecimalMin, Column*/
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -33,7 +31,8 @@ public class EmployeeRequest {
     @NotNull(message = "EL CAMPO FECHA DE NACIMIENTO NO PUEDE SER NULO")
     private LocalDate birthDate;
 
-    @Min(0)
+    // @Min(0) // tipos numéricos enteros, pero para BigDecimal @DecimalMin
+    @DecimalMin(value = "0.0", inclusive = true, message = "EL SALARIO NO PUEDE SER NEGATIVO")
     private BigDecimal salary;
 
     // @NotNull(message = "EL CAMPO FECHA DE CONTRATO NO PUEDE SER NULO")
@@ -41,8 +40,7 @@ public class EmployeeRequest {
 
     private LocalDate endDate;
 
-    @NotNull
-    @NotBlank // Pensado para campos string y que no estén vacios
+    @NotBlank(message = "LA DESCRIPCIÓN ES OBLIGATORIA, NO ACEPTA NULL")
     private String description;
 
     @NotNull(message = "EL CAMPO DE ESTADO DEL EMPLEADO DEBE ESTAR EN MAYUSCULA")

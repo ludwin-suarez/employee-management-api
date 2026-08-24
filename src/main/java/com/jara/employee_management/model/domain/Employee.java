@@ -1,7 +1,7 @@
 package com.jara.employee_management.model.domain;
 
 import lombok.Data;
-import jakarta.persistence.*;
+import jakarta.persistence.*;//column> usar para restringuir limite de char
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
