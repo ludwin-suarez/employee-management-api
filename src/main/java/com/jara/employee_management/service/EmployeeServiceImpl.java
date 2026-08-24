@@ -46,6 +46,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     }
 
+    private boolean searchDni(String dni) {
+        List<Long> estadosValidos = List.of(1L, 2L, 3L, 4L, 5L);
+        return employeeRepository.existsByDniAndStatusIdIn(dni, estadosValidos);
+
+    }
     // =========================================================
 
     // LIST EMPLOYEES
@@ -61,6 +66,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public List<EmployeeResponse> create(EmployeeRequest request) {
+
+        if (searchDni(request.getDni()) == true) {
+            throw new BusinessException(
+                    "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU ACTIVACIÓN");
+        }
+
         Employee employ = EmployeeMapper.toEntity(request);
         employ.setEmployeeStatus(optionalEmployeeStatus(request.getCode()));
         employ.setDepartment(optionalDepartment(request.getDepartmentId(), true));
@@ -104,7 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract) {
         Employee employee = employeeRepository.findByIdAndActive(id, true)
-                .orElseThrow(() -> new ResourceNotFoundException("  EMPLEADO NO ENCONTRADO CON ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("EMPLEADO NO ENCONTRADO CON ID: " + id));
 
         if (dateEndContract == null) {
             throw new BusinessException(
@@ -129,7 +140,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // DELETE LOGICALLY
     @Override
     public String deleteLogico(Long id) {
-        Employee employee = employeeRepository.findByIdAndActive(id, true)
+        Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON ID: " + id));
         EmployeeStatus status = optionalEmployeeStatus("DELET");// DELETE LOGICAMENTE
         employee.setActive(false);

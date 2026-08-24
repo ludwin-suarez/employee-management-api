@@ -25,13 +25,13 @@ public class EmployeeController {
     private final EmployeeService employeeService; // inyección de dependencias
 
     // GET /api/employee
-    @GetMapping("/listar")
+    @GetMapping("/list_employees")
     public List<EmployeeResponse> list() {
         return employeeService.list();
     }
 
     // POST /api/employee
-    @PostMapping()
+    @PostMapping("/create_employee")
     public List<EmployeeResponse> create(
             @RequestBody @Valid EmployeeRequest request) {
         log.info("request: {}", request);
@@ -39,7 +39,7 @@ public class EmployeeController {
     }
 
     // GET /api/employee/{id}
-    @GetMapping("/{id}")
+    @GetMapping("/search_employee/{id}")
     public EmployeeResponse getById(
             @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
         return employeeService.getById(idEmployee);
@@ -47,7 +47,7 @@ public class EmployeeController {
 
     /* 1 - "ACTIVE" ; 2 - "VACATION" ; 3 - "REST"; 4 - "INACTIVE" */
     // PATCH /api/employee/{id}/{code}
-    @PatchMapping("/{id}/{code}")
+    @PatchMapping("update_status_employee/{id}/{code}")
     public EmployeeResponse updateEmployeeState(
             @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee,
             @PathVariable String code) {
@@ -60,7 +60,7 @@ public class EmployeeController {
      */
 
     // PUT /api/employee/{id}/{endDate}/{code}
-    @PutMapping("/{id}/{endDate}")
+    @PutMapping("end_contract_employee/{id}/{endDate}")
     public EmployeeResponse updateEndContract(
             @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee,
             @PathVariable("endDate") LocalDate dateEndContract) {
@@ -68,7 +68,7 @@ public class EmployeeController {
     }
 
     // DELETE /api/employee/{id}
-    @DeleteMapping("/{id}") // Para este caso tenemos que crear un
+    @DeleteMapping("delete_employee/{id}") // Para este caso tenemos que crear un
     public String delete(
             @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
         return employeeService.deleteLogico(idEmployee);
