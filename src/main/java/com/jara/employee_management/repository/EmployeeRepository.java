@@ -10,25 +10,25 @@ import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    // Optional<Employee> findById(Long id);
+  Optional<Employee> findByDniAndActive(String dni, boolean active);
 
-    Optional<Employee> findByIdAndActive(Long id, boolean active);
+  // busca por id y estado Para eliminar un resgistro
+  List<Employee> findAllByActive(Boolean active);
 
-    // busca por id y estado Para eliminar un resgistro
-    List<Employee> findAllByActive(Boolean state);
+  @Query("""
+      SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END
+      FROM Employee e
+      WHERE e.dni = :dni
+        AND e.employeeStatus.id IN :statusIds
+      """)
+  boolean existsByDniAndStatusIdIn(@Param("dni") String dni, @Param("statusIds") List<Long> statusIds);
 
-    List<Employee> findAllByIdAndActive(Long id, Boolean active);
-
-    // Estos nombres de los parametos tienen que ser igual que las las tablas de BD
-    List<Employee> findAllByDniAndActive(String dni, Boolean active);
-
-    @Query("""
-            SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END
-            FROM Employee e
-            WHERE e.dni = :dni
-              AND e.employeeStatus.id IN :statusIds
-            """)
-    boolean existsByDniAndStatusIdIn(
-            @Param("dni") String dni,
-            @Param("statusIds") List<Long> statusIds);
+  @Query("""
+      SELECT e FROM Employee e
+      WHERE e.dni = :dni
+      AND e.active=:active
+        AND e.employeeStatus.id =:statusIds
+      """)
+  Optional<Employee> findByDniAndStatusIdAndActive(@Param("dni") String dni, @Param("statusIds") Long status,
+      @Param("active") Boolean active);
 }

@@ -10,14 +10,16 @@ public interface EmployeeService {
 
     public List<EmployeeResponse> list();
 
-    public List<EmployeeResponse> create(EmployeeRequest request);
+    public EmployeeResponse create(EmployeeRequest request);
 
-    public EmployeeResponse getById(Long id);
+    public EmployeeResponse getByDni(String dni);
 
-    public EmployeeResponse updateWorkingStatus(Long id, String code);
+    public EmployeeResponse updateWorkingStatus(String dni, String code);
 
-    public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract);
+    public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(String dni, LocalDate dateEndContract);
 
-    public String deleteLogico(Long id);
+    public String deleteLogico(String dni);
+
+    public String activarEmployeeDeleteLogico(String dni);
 
 }

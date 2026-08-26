@@ -19,8 +19,9 @@ import com.jara.employee_management.repository.EmployeeStatusRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;//java 8-15
 //import java.util.stream.Stream;//toList() java 21, no necesita importar
 
 @Service
@@ -65,7 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     // CREATE EMPLOYEE
     @Transactional
     @Override
-    public List<EmployeeResponse> create(EmployeeRequest request) {
+    public EmployeeResponse create(EmployeeRequest request) {
 
         if (searchDni(request.getDni()) == true) {
             throw new BusinessException(
@@ -76,18 +77,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         employ.setEmployeeStatus(optionalEmployeeStatus(request.getCode()));
         employ.setDepartment(optionalDepartment(request.getDepartmentId(), true));
         employeeRepository.save(employ);
-        return employeeRepository.findAllByDniAndActive(employ.getDni(), employ.isActive()).stream()
-                .map(EmployeeMapper::toResponse).collect(Collectors.toList());// java 8
-        // .map(EmployeeMapper::toResponse).toList(); java 21
+        return employeeRepository.findByDniAndActive(employ.getDni(), employ.isActive())
+                .map(EmployeeMapper::toResponse)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "EMPLEADO NO ENCONTRADO CON DNI: " + employ.getDni()));
     }
 
     // SEARCH EMPLOYEE FOR ID
     @Transactional(readOnly = true) // work with @ManyToOne(fetch = FetchType.LAZY)
     @Override // Caso contrario se cierra la sesion antes de mapear la data
-    public EmployeeResponse getById(Long id) {
-        return employeeRepository.findByIdAndActive(id, true).map(EmployeeMapper::toResponse)
+    public EmployeeResponse getByDni(String dni) {
+        return employeeRepository.findByDniAndActive(dni, true).map(EmployeeMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "EMPLEADO NO ENCONTRADO CON ID: " + id));
+                        "EMPLEADO NO ENCONTRADO CON DNI: " + dni));
 
         // .stream().map(EmployeeMapper::toResponse).collect(Collectors.toList());//java
         // 8-15
@@ -99,10 +101,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     // UPDATE STATUS EMPLOYEE, SEARCH FOR ID AND CODE
     @Transactional()
     @Override
-    public EmployeeResponse updateWorkingStatus(Long id, String code) {
-        Employee employee = employeeRepository.findByIdAndActive(id, true)
+    public EmployeeResponse updateWorkingStatus(String dni, String code) {
+        Employee employee = employeeRepository.findByDniAndActive(dni, true)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "EMPLEADO NO ENCONTRADO CON ID: " + id));
+                        "EMPLEADO NO ENCONTRADO CON DNI: " + dni));
 
         employee.setEmployeeStatus(optionalEmployeeStatus(code));// Codigo para delete
         employee.setUpdatedAt(LocalDateTime.now());
@@ -110,12 +112,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
     }
 
-    // UPDATE CONTRACT END DATE POR ID AND ENDDATE
+    // UPDATE CONTRACT END DATE POR DNI AND ENDDATE
     @Transactional()
     @Override
-    public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(Long id, LocalDate dateEndContract) {
-        Employee employee = employeeRepository.findByIdAndActive(id, true)
-                .orElseThrow(() -> new ResourceNotFoundException("EMPLEADO NO ENCONTRADO CON ID: " + id));
+    public EmployeeResponse updateEndContractAndUpdateInactivoAutomatic(String dni, LocalDate dateEndContract) {
+        Employee employee = employeeRepository.findByDniAndActive(dni, true)
+                .orElseThrow(() -> new ResourceNotFoundException("EMPLEADO NO ENCONTRADO CON DNI: " + dni));
 
         if (dateEndContract == null) {
             throw new BusinessException(
@@ -131,7 +133,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         ;
         employee.setEndDate(dateEndContract);
-        employee.setActive(false);
+        // employee.setActive(false);
         employee.setEmployeeStatus(optionalEmployeeStatus("INACTIVE"));
         employee.setUpdatedAt(LocalDateTime.now());
         return EmployeeMapper.toResponse(employeeRepository.save(employee));
@@ -139,15 +141,30 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     // DELETE LOGICALLY
     @Override
-    public String deleteLogico(Long id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON ID: " + id));
+    public String deleteLogico(String dni) {
+        Employee employee = employeeRepository.findByDniAndActive(dni, true)
+                .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON DNI: " + dni));
         EmployeeStatus status = optionalEmployeeStatus("DELET");// DELETE LOGICAMENTE
         employee.setActive(false);
         employee.setEmployeeStatus(status);
         employee.setUpdatedAt(LocalDateTime.now());
         employeeRepository.save(employee);
-        return "Registro Eliminado Lógicamente: " + employee.getName();
+        return "Registro Eliminado Lógicamente, DNI :" + employee.getDni() + " NOMBRE: " + employee.getName();
+    }
+
+    @Transactional
+    @Override
+    public String activarEmployeeDeleteLogico(String dni) {
+        Employee employee = employeeRepository.findByDniAndStatusIdAndActive(dni, 5L, false)
+                .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON DNI : " + dni));
+        EmployeeStatus status = optionalEmployeeStatus("ACTIVE");
+        employee.setActive(true);
+        employee.setEmployeeStatus(status);
+        employee.setHireDate(LocalDate.now());
+        employee.setEndDate(null);
+        employee.setUpdatedAt(LocalDateTime.now());
+        employeeRepository.save(employee);
+        return "SE HA REACTIVADO EMPLEADO CON DNI: " + employee.getDni() + " NOMBRE: " + employee.getName();
     }
 
 }

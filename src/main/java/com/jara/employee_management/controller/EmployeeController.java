@@ -11,6 +11,7 @@ import com.jara.employee_management.service.EmployeeService;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,38 +49,38 @@ public class EmployeeController {
                         @ApiResponse(responseCode = "409", description = "El DNI del empleado ya existe")
         })
         @PostMapping("/create_employee")
-        public List<EmployeeResponse> create(
+        public EmployeeResponse create(
                         @RequestBody @Valid EmployeeRequest request) {
                 log.info("request: {}", request);
                 return employeeService.create(request);
         }
 
-        // GET /api/employee/{id}
-        @Operation(summary = "Buscar empleado por ID", description = "Obtiene un empleado activo mediante su identificador.")
+        // GET /api/employee/{dni}
+        @Operation(summary = "Buscar empleado por DNI", description = "Obtiene un empleado activo mediante su DNI.")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Empleado encontrado correctamente"),
-                        @ApiResponse(responseCode = "400", description = "El ID debe ser mayor que 0"),
+                        @ApiResponse(responseCode = "400", description = "El DNI debe tener 8 digitos numericos"),
                         @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
         })
-        @GetMapping("/search_employee/{id}")
-        public EmployeeResponse getById(
-                        @Parameter(description = "Identificador único del empleado", example = "92", required = true) @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
-                return employeeService.getById(idEmployee);
+        @GetMapping("/search_employee/{dni}")
+        public EmployeeResponse getByDni(
+                        @Parameter(description = "DNI del empleado", example = "70567890", required = true) @Size(min = 8, max = 8, message = "EL DNI DEBE TENER UN TAMAÑO FIJO DE 8 CARACTERES") @PathVariable("dni") String dni) {
+                return employeeService.getByDni(dni);
         }
 
         /* 1 - "ACTIVE" ; 2 - "VACATION" ; 3 - "REST"; 4 - "INACTIVE" */
-        // PATCH /api/employee/{id}/{code}
-        @Operation(summary = "Actualizar estado del empleado", description = "Actualiza el estado de un empleado activo utilizando su ID y el código del nuevo estado.")
+        // PATCH /api/employee/{dni}/{code}
+        @Operation(summary = "Actualizar estado del empleado", description = "Actualiza el estado de un empleado activo utilizando su DNI y el código del nuevo estado.")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Empleado encontrado correctamente"),
-                        @ApiResponse(responseCode = "400", description = "El ID debe ser mayor que 0"),
+                        @ApiResponse(responseCode = "400", description = "El DNI debe tener 8 digitos numericos"),
                         @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
         })
-        @PatchMapping("update_status_employee/{id}/{code}")
+        @PatchMapping("update_status_employee/{dni}/{code}")
         public EmployeeResponse updateEmployeeState(
-                        @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee,
+                        @PathVariable("dni") @Size(min = 8, max = 8, message = "EL DNI DEBE TENER UN TAMAÑO FIJO DE 8 CARACTERES") String dni,
                         @Parameter(description = "Código del nuevo estado del empleado. Valores permitidos: ACTIVE, VACATION, REST, INACTIVE.", example = "VACATION", required = true) @PathVariable("code") String code) {
-                return employeeService.updateWorkingStatus(idEmployee, code);
+                return employeeService.updateWorkingStatus(dni, code);
         }
 
         /*
@@ -87,31 +88,43 @@ public class EmployeeController {
          * { "contractenddate": "2023-06-25" }
          */
 
-        // PUT /api/employee/{id}/{endDate}/{code}
+        // PUT /api/employee/{dni}/{endDate}/{code}
         @Operation(summary = "Finalizar contrato de un empleado", description = "Registra la fecha de fin de contrato y cambia automáticamente al empleado a estado INACTIVE.")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Empleado encontrado correctamente"),
-                        @ApiResponse(responseCode = "400", description = "El ID debe ser mayor que 0"),
+                        @ApiResponse(responseCode = "400", description = "El DNI debe tener 8 digitos numericos"),
                         @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
         }) // FALTA PARA FECHA
-        @PutMapping("end_contract_employee/{id}/{endDate}")
+        @PutMapping("end_contract_employee/{dni}/{endDate}")
         public EmployeeResponse updateEndContract(
-                        @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee,
+                        @PathVariable("dni") @Size(min = 8, max = 8, message = "EL DNI DEBE TENER UN TAMAÑO FIJO DE 8 CARACTERES") String dni,
                         @Parameter(description = "Fecha de finalización del contrato", example = "2026-12-31", required = true) @PathVariable("endDate") LocalDate dateEndContract) {
-                return employeeService.updateEndContractAndUpdateInactivoAutomatic(idEmployee, dateEndContract);
+                return employeeService.updateEndContractAndUpdateInactivoAutomatic(dni, dateEndContract);
         }
 
         // DELETE /api/employee/{id}
         @Operation(summary = "Eliminar lógicamente un empleado", description = "Desactiva lógicamente un empleado. El registro permanece almacenado en la base de datos, pero su campo active pasa a false.")
         @ApiResponses({
                         @ApiResponse(responseCode = "200", description = "Empleado eliminado correctamente"),
-                        @ApiResponse(responseCode = "400", description = "El ID debe ser mayor que 0"),
+                        @ApiResponse(responseCode = "400", description = "El DNI debe tener 8 digitos numericos"),
                         @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
         })
-        @DeleteMapping("delete_employee/{id}") // Para este caso tenemos que crear un
+        @DeleteMapping("delete_employee/{dni}") // Para este caso tenemos que crear un
         public String delete(
-                        @PathVariable("id") @Positive(message = "EL ID DEL EMPLEADO DEBE SER MAYOR QUE 0") Long idEmployee) {
-                return employeeService.deleteLogico(idEmployee);
+                        @PathVariable("dni") @Size(min = 8, max = 8, message = "EL DNI DEBE TENER UN TAMAÑO FIJO DE 8 CARACTERES") String dni) {
+                return employeeService.deleteLogico(dni);
+        }
+
+        @Operation(summary = "Reactivar el estado de un Empleado", description = "Reactiva lógicamente un empleado. El registro almacenado en la base de datos en estado 0, pero su campo active pasa a true.")
+        @ApiResponses({
+                        @ApiResponse(responseCode = "200", description = "Empleado reactivado correctamente"),
+                        @ApiResponse(responseCode = "400", description = "El DNI debe tener 8 digitos numericos"),
+                        @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
+        })
+        @PatchMapping("reactive_employee/{dni}")
+        public String activeEmployee(
+                        @PathVariable("dni") @Size(min = 8, max = 8, message = "EL DNI DEBE TENER UN TAMAÑO FIJO DE 8 CARACTERES") String dni) {
+                return employeeService.activarEmployeeDeleteLogico(dni);
         }
 
 }
