@@ -69,7 +69,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (searchDni(request.getDni()) == true) {
             throw new BusinessException(
-                    "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU ACTIVACIÓN");
+                    "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU ACTIVACIÓN: HTTP:409?");
         }
 
         Employee employ = EmployeeMapper.toEntity(request);
