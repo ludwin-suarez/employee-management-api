@@ -10,7 +10,6 @@ import com.jara.employee_management.model.response.EmployeeResponse;
 import com.jara.employee_management.service.EmployeeService;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
