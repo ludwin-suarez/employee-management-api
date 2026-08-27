@@ -29,8 +29,9 @@ public class EmployeeMapper {
         employ.setDescription(request.getDescription());
 
         employ.setActive(true);
-        employ.setCreatedAt(LocalDateTime.now());
-        employ.setUpdatedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        employ.setCreatedAt(now);
+        employ.setUpdatedAt(now);
 
         return employ;
     }
@@ -40,13 +41,13 @@ public class EmployeeMapper {
         return EmployeeResponse.builder()
                 .dni(employee.getDni())
                 .name(employee.getName())
-                .lastname(employee.getLastName())
-                .dateofbirth(employee.getBirthDate())
+                .lastName(employee.getLastName())
+                .birthDate(employee.getBirthDate())
                 .salary(employee.getSalary())
-                .contractdate(employee.getHireDate())
-                .contractenddate(employee.getEndDate())
+                .hireDate(employee.getHireDate())
+                .endDate(employee.getEndDate())
                 .description(employee.getDescription())
-                .employeStatus(toStatusResponse(employee.getEmployeeStatus()))
+                .employeeStatus(toStatusResponse(employee.getEmployeeStatus()))
                 .department(toDepartmentResponse(employee.getDepartment()))
                 .active(employee.isActive())
                 .build();

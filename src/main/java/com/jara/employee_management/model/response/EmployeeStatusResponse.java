@@ -9,11 +9,12 @@ import lombok.Data;
 @Schema(description = "INFORMACIÓN DEL ESTADO DEL EMPLEADO")
 public class EmployeeStatusResponse {
 
-    @Schema(description = "ID DEL ESTATUS DEL EMPLEADO")
+    @Schema(description = "ID DEL ESTADO", example = "1")
     private Long id;
-    @Schema(description = "CÓDIGO ASIGNADO AL EMPLEADO", example = "ACTIVE-VACATION-REST-INACTIVE")
-    private String code;
-    @Schema(description = "NOMBRE EN ESPAÑOL DEL ESTADO ASIGNADO")
-    private String name;
 
+    @Schema(description = "CÓDIGO DEL ESTADO DEL EMPLEADO", example = "ACTIVE")
+    private String code;
+
+    @Schema(description = "NOMBRE DEL ESTADO DEL EMPLEADO", example = "ACTIVO")
+    private String name;
 }

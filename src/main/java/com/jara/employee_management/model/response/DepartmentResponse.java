@@ -6,12 +6,12 @@ import lombok.Data;
 
 @Data
 @Builder
-@Schema(description = "INFORMACIÓN DEL DEPARTAMENTO QUE SE ENCUENTRA ASGINADO EL EMPLEADO")
+@Schema(description = "INFORMACIÓN DEL DEPARTAMENTO ASIGNADO AL EMPLEADO")
 public class DepartmentResponse {
 
-    @Schema(description = "ID DEL DEPARTAMENTO")
+    @Schema(description = "ID DEL DEPARTAMENTO", example = "1")
     private Long id;
-    @Schema(description = "NOMBRE DEL DEPARTAMENTO")
-    private String name;
 
+    @Schema(description = "NOMBRE DEL DEPARTAMENTO", example = "TECNOLOGÍA")
+    private String name;
 }

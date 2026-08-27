@@ -13,30 +13,42 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "INFORMACIÓN DEL EMPLEADO")
 public class EmployeeResponse {
 
+    @Schema(description = "ID DEL EMPLEADO", example = "102")
+    private Long id;
+
     @Schema(description = "DNI DEL EMPLEADO", example = "70234567")
     private String dni;
 
     @Schema(description = "NOMBRE DEL EMPLEADO", example = "Maria")
     private String name;
-    @Schema(description = "APELLIDOS DEL EMPLEADO", example = "Lopes Torres")
-    private String lastname;
+
+    @Schema(description = "APELLIDOS DEL EMPLEADO", example = "Lopez Torres")
+    private String lastName;
+
     @Schema(description = "CORREO PERSONAL DEL EMPLEADO", example = "maria.lopez@gmail.com")
     private String email;
+
     @Schema(description = "FECHA DE NACIMIENTO DEL EMPLEADO", example = "1995-05-15")
-    private LocalDate dateofbirth;
+    private LocalDate birthDate;
+
     @Schema(description = "SALARIO DEL EMPLEADO", example = "2600.00")
     private BigDecimal salary;
+
     @Schema(description = "FECHA DE INICIO DE CONTRATO DEL EMPLEADO", example = "2026-05-15")
-    private LocalDate contractdate;
+    private LocalDate hireDate;
+
     @Schema(description = "FECHA DE FIN DE CONTRATO DEL EMPLEADO", example = "2026-08-15")
-    private LocalDate contractenddate;
-    @Schema(description = "DESCRIPCIÓN DEL EMPLEADO A QUE ÁREA ES ASIGNADO", example = "ASIGNADO A AREA DE RR HH")
+    private LocalDate endDate;
+
+    @Schema(description = "DESCRIPCIÓN DEL EMPLEADO", example = "ASIGNADO AL ÁREA DE RR HH")
     private String description;
 
-    private EmployeeStatusResponse employeStatus;
+    @Schema(description = "ESTADO ACTUAL DEL EMPLEADO")
+    private EmployeeStatusResponse employeeStatus;
+
+    @Schema(description = "DEPARTAMENTO ASIGNADO AL EMPLEADO")
     private DepartmentResponse department;
 
-    @Schema(description = "MUESTRA QUE SI EL EMPLEADO SE ENCUENTRA ACTIVO", example = "ACTIVO")
+    @Schema(description = "INDICA SI EL EMPLEADO SE ENCUENTRA ACTIVO", example = "true")
     private Boolean active;
-
 }
