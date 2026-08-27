@@ -10,7 +10,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Data
 @Builder
-@Schema(description = "INFORMACIÓN DEL EMPLEADO")
+@Schema(description = "INFORMACIÓN DEL EMPLEADO", example = """
+        {
+          "dni": "70567890",
+          "name": "Maria",
+          "lastName": "Lopez Torres",
+          "email": "maria.lopez@gmail.com",
+          "birthDate": "1995-05-15",
+          "salary": 2600.00,
+          "hireDate": "2026-05-15",
+          "endDate": null,
+          "description": "Asignado al área de Recursos Humanos",
+          "employeeStatus": {
+            "id": 1,
+            "code": "ACTIVE",
+            "name": "ACTIVO"
+          },
+          "department": {
+            "id": 2,
+            "name": "Recursos Humanos"
+          },
+          "active": true
+        }
+        """)
 public class EmployeeResponse {
 
     @Schema(description = "ID DEL EMPLEADO", example = "102")
