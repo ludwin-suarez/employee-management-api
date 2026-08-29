@@ -85,7 +85,8 @@ public class EmployeeController {
         @PatchMapping("update_status_employee/{dni}/{code}")
         public EmployeeResponse updateEmployeeState(
                         @Parameter(description = "DNI del empleado", example = "70567890", required = true) @PathVariable("dni") @Size(min = 8, max = 8) @Pattern(regexp = "\\d{8}") String dni,
-                        @PathVariable("code") @Pattern(regexp = "ACTIVE|VACATION|REST|INACTIVE", message = "EL ESTADO DEBE SER ACTIVE, VACATION, REST O INACTIVE") String code) {
+                        @Parameter(description = "Código del nuevo estado del empleado. Valores permitidos: ACTIVE, VACATION, REST, INACTIVE.", example = "VACATION", required = true) @PathVariable("code") @Pattern(regexp = "ACTIVE|VACATION|REST|INACTIVE", message = "EL ESTADO DEBE SER ACTIVE, VACATION, REST O INACTIVE") String code) {
+
                 return employeeService.updateWorkingStatus(dni, code);
         }
 
@@ -101,11 +102,12 @@ public class EmployeeController {
                         @ApiResponse(responseCode = "400", description = "El DNI o la fecha proporcionada no son válidos"),
                         @ApiResponse(responseCode = "404", description = "Empleado no encontrado"),
                         @ApiResponse(responseCode = "500", description = "Error interno inesperado del servidor")
-        }) // FALTA PARA FECHA
+        })
         @PutMapping("end_contract_employee/{dni}/{endDate}")
         public EmployeeResponse updateEndContract(
                         @Parameter(description = "DNI del empleado", example = "70567890", required = true) @PathVariable("dni") @Size(min = 8, max = 8) @Pattern(regexp = "\\d{8}") String dni,
                         @Parameter(description = "Fecha en la que finaliza el contrato del empleado. Formato: YYYY-MM-DD.", example = "2026-12-31", required = true) @PathVariable("endDate") LocalDate dateEndContract) {
+
                 return employeeService.updateEndContractAndUpdateInactivoAutomatic(dni, dateEndContract);
         }
 
