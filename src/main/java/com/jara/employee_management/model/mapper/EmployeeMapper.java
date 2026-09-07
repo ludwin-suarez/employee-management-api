@@ -42,6 +42,7 @@ public class EmployeeMapper {
                 .dni(employee.getDni())
                 .name(employee.getName())
                 .lastName(employee.getLastName())
+                .email(employee.getEmail())
                 .birthDate(employee.getBirthDate())
                 .salary(employee.getSalary())
                 .hireDate(employee.getHireDate())
