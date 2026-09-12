@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.jara.employee_management.exception.BusinessException;
 import com.jara.employee_management.exception.ResourceNotFoundException;
+import com.jara.employee_management.exception.DuplicateResourceException;
 import com.jara.employee_management.model.domain.Department;
 import com.jara.employee_management.model.domain.Employee;
 import com.jara.employee_management.model.domain.EmployeeStatus;
@@ -68,8 +69,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeResponse create(EmployeeRequest request) {
 
         if (searchDni(request.getDni()) == true) {
-            throw new BusinessException(
-                    "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU ACTIVACIÓN: HTTP:409?");
+            throw new DuplicateResourceException(
+                    "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU REACTIVACIÓN");
         }
 
         Employee employ = EmployeeMapper.toEntity(request);
@@ -154,7 +155,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Transactional
     @Override
     public String activarEmployeeDeleteLogico(String dni) {
-        Employee employee = employeeRepository.findByDniAndStatusIdAndActive(dni, 5L, false)
+        Employee employee = employeeRepository.findByDniAndStatusCodeAndActive(dni, "DELET", false)
                 .orElseThrow(() -> new ResourceNotFoundException(" EMPLEADO NO ENCONTRADO CON DNI : " + dni));
         EmployeeStatus status = optionalEmployeeStatus("ACTIVE");
         employee.setActive(true);

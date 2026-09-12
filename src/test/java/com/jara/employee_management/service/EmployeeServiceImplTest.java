@@ -784,9 +784,9 @@ public class EmployeeServiceImplTest {
                 employee.setHireDate(LocalDate.of(2025, 1, 10));
                 employee.setEndDate(LocalDate.of(2025, 12, 31));
 
-                when(employeeRepository.findByDniAndStatusIdAndActive(
+                when(employeeRepository.findByDniAndStatusCodeAndActive(
                                 "70567890",
-                                5L,
+                                "DELET",
                                 false))
                                 .thenReturn(Optional.of(employee));
                 when(employeeStatusRepository.findByCode("ACTIVE"))
@@ -810,9 +810,9 @@ public class EmployeeServiceImplTest {
                 assertNull(employee.getEndDate());
 
                 verify(employeeRepository)
-                                .findByDniAndStatusIdAndActive(
+                                .findByDniAndStatusCodeAndActive(
                                                 "70567890",
-                                                5L,
+                                                "DELET",
                                                 false);
 
                 verify(employeeStatusRepository)
@@ -826,9 +826,9 @@ public class EmployeeServiceImplTest {
         void debeLanzarExcepcionCuandoEmpleadoNoExisteAlReactivar() {
 
                 // Arrange
-                when(employeeRepository.findByDniAndStatusIdAndActive(
+                when(employeeRepository.findByDniAndStatusCodeAndActive(
                                 "70567890",
-                                5L,
+                                "DELET",
                                 false))
                                 .thenReturn(Optional.empty());
                 // Act
@@ -841,9 +841,9 @@ public class EmployeeServiceImplTest {
                                 " EMPLEADO NO ENCONTRADO CON DNI : 70567890",
                                 exception.getMessage());
                 verify(employeeRepository)
-                                .findByDniAndStatusIdAndActive(
+                                .findByDniAndStatusCodeAndActive(
                                                 "70567890",
-                                                5L,
+                                                "DELET",
                                                 false);
         }
 }

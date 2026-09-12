@@ -84,6 +84,14 @@
             <version>3.1.0</version>
         </dependency>
 
+        <!-- H2 solamente estará disponible durante las pruebas a BD.-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+
     </dependencies>
 
     <!-- Build -->

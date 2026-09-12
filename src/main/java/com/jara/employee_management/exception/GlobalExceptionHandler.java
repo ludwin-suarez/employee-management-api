@@ -192,4 +192,24 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.METHOD_NOT_ALLOWED)
                                 .body(response);
         }
+
+        // =========================================================
+        // 8. CONTROLAR EL DNI DUPLICADO - HTTP 409
+        // =========================================================
+
+        @ExceptionHandler(DuplicateResourceException.class)
+        public ResponseEntity<Map<String, Object>> handleDuplicateResource(
+                        DuplicateResourceException exception) {
+
+                Map<String, Object> response = new HashMap<>();
+
+                response.put("timestamp", LocalDateTime.now());
+                response.put("status", HttpStatus.CONFLICT.value());
+                response.put("error", "DUPLICATE_RESOURCE");
+                response.put("message", exception.getMessage());
+
+                return ResponseEntity
+                                .status(HttpStatus.CONFLICT)
+                                .body(response);
+        }
 }

@@ -27,8 +27,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
       SELECT e FROM Employee e
       WHERE e.dni = :dni
       AND e.active=:active
-        AND e.employeeStatus.id =:statusIds
+        AND e.employeeStatus.code =:code
       """)
-  Optional<Employee> findByDniAndStatusIdAndActive(@Param("dni") String dni, @Param("statusIds") Long status,
+  Optional<Employee> findByDniAndStatusCodeAndActive(@Param("dni") String dni, @Param("code") String code,
       @Param("active") Boolean active);
 }
