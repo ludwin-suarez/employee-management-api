@@ -15,14 +15,18 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
   // busca por id y estado Para eliminar un resgistro
   List<Employee> findAllByActive(Boolean active);
 
-  @Query("""
-      SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END
-      FROM Employee e
-      WHERE e.dni = :dni
-        AND e.employeeStatus.id IN :statusIds
-      """)
-  boolean existsByDniAndStatusIdIn(@Param("dni") String dni, @Param("statusIds") List<Long> statusIds);
-
+  /*
+   * // Se actualizó la búsqueda de DNI - éste metod. validaba al principio
+   * 
+   * @Query("""
+   * SELECT CASE WHEN COUNT(e) > 0 THEN true ELSE false END
+   * FROM Employee e
+   * WHERE e.dni = :dni
+   * AND e.employeeStatus.id IN :statusIds
+   * """)
+   * boolean existsByDniAndStatusIdIn(@Param("dni") String
+   * dni, @Param("statusIds") List<Long> statusIds);
+   */
   @Query("""
       SELECT e FROM Employee e
       WHERE e.dni = :dni
@@ -31,4 +35,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
       """)
   Optional<Employee> findByDniAndStatusCodeAndActive(@Param("dni") String dni, @Param("code") String code,
       @Param("active") Boolean active);
+
+  boolean existsByDni(String dni);
 }

@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
 
                 response.put("timestamp", LocalDateTime.now());
                 response.put("status", HttpStatus.NOT_FOUND.value());
-                response.put("error", "RESOURCE NOT_FOUND");
+                response.put("error", "RESOURCE_NOT_FOUND");
                 response.put("message", exception.getMessage());
 
                 return ResponseEntity

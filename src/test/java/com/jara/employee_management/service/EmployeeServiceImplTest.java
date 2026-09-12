@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.DuplicateFormatFlagsException;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.argThat;
 
 import com.jara.employee_management.model.request.EmployeeRequest;
 import com.jara.employee_management.exception.BusinessException;
+import com.jara.employee_management.exception.DuplicateResourceException;
 import com.jara.employee_management.exception.ResourceNotFoundException;
 import com.jara.employee_management.model.domain.Department;
 import com.jara.employee_management.model.domain.Employee;
@@ -176,17 +178,11 @@ public class EmployeeServiceImplTest {
                 employee.setDepartment(department);
                 employee.setActive(true);
 
-                when(employeeRepository.existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList()))
-                                .thenReturn(false);
-
+                when(employeeRepository.existsByDni("70567890")).thenReturn(false);
                 when(employeeStatusRepository.findByCode("ACTIVE"))
                                 .thenReturn(Optional.of(status));
-
                 when(departmentRepository.findByIdAndActive(1L, true))
                                 .thenReturn(Optional.of(department));
-
                 when(employeeRepository.findByDniAndActive("70567890", true))
                                 .thenReturn(Optional.of(employee));
 
@@ -218,16 +214,12 @@ public class EmployeeServiceImplTest {
 
                 assertTrue(resultado.getActive());
 
-                verify(employeeRepository).existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList());
+                verify(employeeRepository).existsByDni(
+                                eq("70567890"));
 
                 verify(employeeRepository).save(any(Employee.class));
-
                 verify(employeeStatusRepository).findByCode("ACTIVE");
-
                 verify(departmentRepository).findByIdAndActive(1L, true);
-
                 verify(employeeRepository).findByDniAndActive("70567890", true);
         }
 
@@ -237,24 +229,20 @@ public class EmployeeServiceImplTest {
                 EmployeeRequest request = new EmployeeRequest();
                 request.setDni("70567890");
 
-                when(employeeRepository.existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList()))
+                when(employeeRepository.existsByDni("70567890"))
                                 .thenReturn(true);
 
                 // Act
-                BusinessException exception = assertThrows(
-                                BusinessException.class,
+                DuplicateResourceException exception = assertThrows(
+                                DuplicateResourceException.class,
                                 () -> employeeService.create(request));
 
                 // Assert
                 assertEquals(
-                                "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU ACTIVACIÓN: HTTP:409?",
+                                "EL EMPLEADO YA SE ENCUENTRA REGISTRADO, SOLICITAR A SOPORTE TÉCNICO SU REACTIVACIÓN",
                                 exception.getMessage());
 
-                verify(employeeRepository).existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList());
+                verify(employeeRepository).existsByDni("70567890");
         }
 
         @Test
@@ -273,11 +261,7 @@ public class EmployeeServiceImplTest {
                 request.setCode("ACTIVE");
                 request.setDepartmentId(1L);
 
-                when(employeeRepository.existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList()))
-                                .thenReturn(false);
-
+                when(employeeRepository.existsByDni("70567890")).thenReturn(false);
                 when(employeeStatusRepository.findByCode("ACTIVE"))
                                 .thenReturn(java.util.Optional.empty());
 
@@ -289,10 +273,7 @@ public class EmployeeServiceImplTest {
                 // Assert
                 assertEquals("CODIGO NO ENCONTRADO: ACTIVE", exception.getMessage());
 
-                verify(employeeRepository).existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList());
-
+                verify(employeeRepository).existsByDni("70567890");
                 verify(employeeStatusRepository).findByCode("ACTIVE");
         }
 
@@ -318,9 +299,7 @@ public class EmployeeServiceImplTest {
                 status.setCode("ACTIVE");
                 status.setName("ACTIVO");
 
-                when(employeeRepository.existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList()))
+                when(employeeRepository.existsByDni("70567890"))
                                 .thenReturn(false);
 
                 when(employeeStatusRepository.findByCode("ACTIVE"))
@@ -339,12 +318,8 @@ public class EmployeeServiceImplTest {
                                 "ID DEPARTMENT NO ENCONTRADO: 1",
                                 exception.getMessage());
 
-                verify(employeeRepository).existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList());
-
+                verify(employeeRepository).existsByDni("70567890");
                 verify(employeeStatusRepository).findByCode("ACTIVE");
-
                 verify(departmentRepository).findByIdAndActive(1L, true);
         }
 
@@ -387,9 +362,7 @@ public class EmployeeServiceImplTest {
                 employee.setDepartment(department);
                 employee.setActive(true);
 
-                when(employeeRepository.existsByDniAndStatusIdIn(
-                                eq("70567890"),
-                                anyList()))
+                when(employeeRepository.existsByDni("70567890"))
                                 .thenReturn(false);
 
                 when(employeeStatusRepository.findByCode("ACTIVE"))
@@ -727,16 +700,11 @@ public class EmployeeServiceImplTest {
                                 "Registro Eliminado Lógicamente, DNI :70567890 NOMBRE: Juan",
                                 resultado);
                 assertFalse(employee.isActive());
-                assertEquals(
-                                statusDelete,
-                                employee.getEmployeeStatus());
+                assertEquals(statusDelete, employee.getEmployeeStatus());
 
-                verify(employeeRepository)
-                                .findByDniAndActive("70567890", true);
-                verify(employeeStatusRepository)
-                                .findByCode("DELET");
-                verify(employeeRepository)
-                                .save(employee);
+                verify(employeeRepository).findByDniAndActive("70567890", true);
+                verify(employeeStatusRepository).findByCode("DELET");
+                verify(employeeRepository).save(employee);
         }
 
         @Test
@@ -801,12 +769,8 @@ public class EmployeeServiceImplTest {
                                 "SE HA REACTIVADO EMPLEADO CON DNI: 70567890 NOMBRE: Juan",
                                 resultado);
                 assertTrue(employee.isActive());
-                assertEquals(
-                                statusActive,
-                                employee.getEmployeeStatus());
-                assertEquals(
-                                LocalDate.now(),
-                                employee.getHireDate());
+                assertEquals(statusActive, employee.getEmployeeStatus());
+                assertEquals(LocalDate.now(), employee.getHireDate());
                 assertNull(employee.getEndDate());
 
                 verify(employeeRepository)
@@ -815,11 +779,8 @@ public class EmployeeServiceImplTest {
                                                 "DELET",
                                                 false);
 
-                verify(employeeStatusRepository)
-                                .findByCode("ACTIVE");
-
-                verify(employeeRepository)
-                                .save(employee);
+                verify(employeeStatusRepository).findByCode("ACTIVE");
+                verify(employeeRepository).save(employee);
         }
 
         @Test

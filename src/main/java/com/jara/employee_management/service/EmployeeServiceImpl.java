@@ -48,9 +48,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private boolean searchDni(String dni) {
-        List<Long> estadosValidos = List.of(1L, 2L, 3L, 4L, 5L);
-        return employeeRepository.existsByDniAndStatusIdIn(dni, estadosValidos);
-
+        // List<Long> estadosValidos = List.of(1L, 2L, 3L, 4L, 5L);
+        // return employeeRepository.existsByDniAndStatusIdIn(dni, estadosValidos);
+        return employeeRepository.existsByDni(dni);
     }
     // =========================================================
 
@@ -64,7 +64,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     // CREATE EMPLOYEE
-    @Transactional
+    @Transactional()
     @Override
     public EmployeeResponse create(EmployeeRequest request) {
 
@@ -152,7 +152,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return "Registro Eliminado Lógicamente, DNI :" + employee.getDni() + " NOMBRE: " + employee.getName();
     }
 
-    @Transactional
+    @Transactional()
     @Override
     public String activarEmployeeDeleteLogico(String dni) {
         Employee employee = employeeRepository.findByDniAndStatusCodeAndActive(dni, "DELET", false)
