@@ -16,42 +16,60 @@ import lombok.RequiredArgsConstructor;
 import com.jara.employee_management.model.request.LoginRequest;
 import com.jara.employee_management.model.response.LoginResponse;
 
+import org.springframework.security.core.Authentication;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtEncoder jwtEncoder;
+        private final AuthenticationManager authenticationManager;
+        private final JwtEncoder jwtEncoder;
 
-    public LoginResponse login(LoginRequest request) {
+        public LoginResponse login(LoginRequest request) {
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()));
+                /*
+                 * authenticationManager.authenticate(
+                 * new UsernamePasswordAuthenticationToken(
+                 * request.getUsername(),
+                 * request.getPassword()));
+                 */ // para ingreso por defecto admin
 
-        Instant now = Instant.now();
+                Authentication authentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(
+                                                request.getUsername(),
+                                                request.getPassword()));
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("employee-management-api")
-                .subject(request.getUsername())
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(3600))
-                .claim("role", "ADMIN")
-                .build();
+                String role = authentication.getAuthorities().stream()
 
-        String token = jwtEncoder
-                .encode(
-                        JwtEncoderParameters.from(
-                                JwsHeader.with(
-                                        SignatureAlgorithm.RS256)
-                                        .build(),
-                                claims))
-                .getTokenValue();
+                                .map(authority -> authority.getAuthority())
+                                .filter(authority -> authority.startsWith("ROLE_"))
+                                .map(authority -> authority.substring("ROLE_".length()))
+                                .findFirst()
+                                .orElseThrow(() -> new IllegalStateException(
+                                                "EL USUARIO AUTENTICADO NO TIENE UN ROL ASIGNADO"));
 
-        return LoginResponse.builder()
-                .token(token)
-                .tokenType("Bearer")
-                .build();
-    }
+                Instant now = Instant.now();
+
+                JwtClaimsSet claims = JwtClaimsSet.builder()
+                                .issuer("employee-management-api")
+                                .subject(request.getUsername())
+                                .issuedAt(now)
+                                .expiresAt(now.plusSeconds(3600))
+                                .claim("role", role)
+                                .build();
+
+                String token = jwtEncoder
+                                .encode(
+                                                JwtEncoderParameters.from(
+                                                                JwsHeader.with(
+                                                                                SignatureAlgorithm.RS256)
+                                                                                .build(),
+                                                                claims))
+                                .getTokenValue();
+
+                return LoginResponse.builder()
+                                .token(token)
+                                .tokenType("Bearer")
+                                .build();
+        }
 }

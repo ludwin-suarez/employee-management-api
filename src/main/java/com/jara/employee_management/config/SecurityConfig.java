@@ -15,6 +15,11 @@ import com.jara.employee_management.repository.AppUserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 
+// Para diferenciar permisos de user y admin
+import org.springframework.http.HttpMethod;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+
 @Configuration
 public class SecurityConfig {
 
@@ -44,9 +49,15 @@ public class SecurityConfig {
                                                 // ==========================================
                                                 // ENDPOINTS PROTEGIDOS
                                                 // ==========================================
+                                                /*
+                                                 * .requestMatchers("/api/employee/**")
+                                                 * .authenticated()
+                                                 */
+                                                .requestMatchers(HttpMethod.GET, "/api/employee/**")
+                                                .hasAnyRole("ADMIN", "HR", "USER")
 
                                                 .requestMatchers("/api/employee/**")
-                                                .authenticated()
+                                                .hasRole("ADMIN")
 
                                                 // ==========================================
                                                 // CUALQUIER OTRA PETICIÓN
@@ -59,8 +70,12 @@ public class SecurityConfig {
                                  * Para las peticiones protegidas, espera un Bearer Token JWT y utiliza
                                  * JwtDecoder para validarlo.
                                  */
-                                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
-                                }));
+                                // .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {
+                                // }));
+                                .oauth2ResourceServer(oauth2 -> oauth2
+                                                .jwt(jwt -> jwt
+                                                                .jwtAuthenticationConverter(
+                                                                                jwtAuthenticationConverter())));
 
                 return http.build();
         }
@@ -99,4 +114,20 @@ public class SecurityConfig {
                 // autenticación.
         }
 
+        // transformar los claims del token en las autoridades que usará el sistema de
+        // autorización
+        @Bean //
+        JwtAuthenticationConverter jwtAuthenticationConverter() {
+
+                JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+
+                authoritiesConverter.setAuthoritiesClaimName("role");
+                authoritiesConverter.setAuthorityPrefix("ROLE_");
+
+                JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+
+                converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+
+                return converter;
+        }
 }

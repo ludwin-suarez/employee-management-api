@@ -47,4 +47,5 @@ public class JwtConfig {
                 .withPublicKey(publicKey)
                 .build();
     }
+
 }
